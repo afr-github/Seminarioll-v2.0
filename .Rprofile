@@ -1,12 +1,15 @@
 .First <- function(){
-  cat("Hello!")
+  "Bienvenido"
+  
+  #Cargando todas las paqueterias
+  if(file.exists(".Rprofile")){
+    source(".Rprofile")
+    cargarlibrerias()
+  }
+  
+  #function in file
+  
+  
 } 
 
-#require()
-#Load all packages
 
-#function in file
-if(file.exists("~/ConexionTwitter.r")){
-  source("~/ConexionTwitter.r")
-  cargarllaves()#function name
-}
