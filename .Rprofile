@@ -1,5 +1,5 @@
 .First <- function(){
-  "Bienvenido"
+  cat("Bienvenido\n")
   
   #Cargando todas las paqueterias
   if(file.exists(".Rprofile")){
@@ -11,5 +11,3 @@
   
   
 } 
-
-
