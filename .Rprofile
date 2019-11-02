@@ -6,10 +6,5 @@
     source("RSetup.R")
     cargarlibrerias()
     cargarConexion()
-    TSLATwitterTimelineSearch()
   }
-  
-  #function in file
-  
-  
 } 

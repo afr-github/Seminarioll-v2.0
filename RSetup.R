@@ -29,7 +29,7 @@ if(file.exists(".Rprofile")){
     cat("Archivo obtenido\n")
     file.copy(from = "RprofileSetup.txt", to = ".Rprofile", overwrite = TRUE)
     cat("Archivo leido")
-  }
+  }s
 }
 
 #Reiniciar session
@@ -65,6 +65,7 @@ cargarlibrerias <- function(){
   )
 }
 
+#Cargar conexion con twitter
 cargarConexion <- function(){
   
   #Llaves
@@ -93,14 +94,15 @@ cargarConexion <- function(){
 
 }
 
+
+#Creación del archivo de csv con la información de Tesla
 TSLATwitterTimelineSearch <- function(){
   if(file.exists("TSLATwitterTimeline/TSLATwitterTimelineSearch.R")){
     source("TSLATwitterTimeline/TSLATwitterTimelineSearch.R")
-      TSLATwitterTimelineSearch.f()
+      TSLATwitterTimelineSearch.fechas()
+      TSLATwitterTimelineSearch.df <- TSLATwitterTimelineSearch.df()
+      TSLATwitterTimelineSearch.limpieza(TSLATwitterTimelineSearch.df)
   }
 }
-
-
-
-
+TSLAT
 
