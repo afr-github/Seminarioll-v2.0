@@ -1,6 +1,6 @@
 #Rsetup file
 
-#Checar si existe .Rprofile documento
+#### Checar si existe .Rprofile documento ####
 if(file.exists(".Rprofile")){
   #Leer archvio RprofileSetup.txt, transcribir lo a .Rprofile y resetear 
   #para que tomen efecto los cambios realizados.
@@ -29,13 +29,13 @@ if(file.exists(".Rprofile")){
     cat("Archivo obtenido\n")
     file.copy(from = "RprofileSetup.txt", to = ".Rprofile", overwrite = TRUE)
     cat("Archivo leido")
-  }s
+  }
 }
 
 #Reiniciar session
 
-#Cargar librerias requeridas
-cargarlibrerias <- function(){
+#### Cargar librerias requeridas ####
+cargarLibrerias <- function(){
   paqueteriasRequeridas <- c("twitteR", "rtweet", "influenceR", 
                              "igraph", "SentimentAnalysis", 
                              "syuzhet", "quanteda", "devtools", "remotes",
@@ -64,8 +64,9 @@ cargarlibrerias <- function(){
     }
   )
 }
+cargarLibrerias()
 
-#Cargar conexion con twitter
+#### Cargar conexion con twitter ####
 cargarConexion <- function(){
   
   #Llaves
@@ -93,16 +94,45 @@ cargarConexion <- function(){
   }
 
 }
+cargarConexion()
 
-
-#Creación del archivo de csv con la información de Tesla
-TSLATwitterTimelineSearch <- function(){
+#### TSLATwitterTimeline ####
+#Se carga el archivo con los tweets de Tesla Motors Inc.
+TSLATwitterTimeline <- function(){
   if(file.exists("TSLATwitterTimeline/TSLATwitterTimelineSearch.R")){
     source("TSLATwitterTimeline/TSLATwitterTimelineSearch.R")
-      TSLATwitterTimelineSearch.fechas()
-      TSLATwitterTimelineSearch.df <- TSLATwitterTimelineSearch.df()
-      TSLATwitterTimelineSearch.limpieza(TSLATwitterTimelineSearch.df)
+      TSLATwitterTimeline.df <- TSLATwitterTimeline.Load()
   }
+  return(TSLATwitterTimeline.df)
 }
-TSLAT
+TSLATwitterTimeline.df <- TSLATwitterTimeline()
+
+#### TSLAFollowerTwitterTimeline ####
+#Se carga el archvivo con los Followers de Tesla
+TSLAFollowerTwitterTimeline <- function(){
+  if(file.exists("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")){
+    source("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")
+    TSLATFollowerTwitterTimeline.df <- TSLAFollowerTwitterTimeline.Load()
+  }
+  return(TSLATFollowerTwitterTimeline.df)
+}
+TSLATFollowerTwitterTimeline.df <- TSLAFollowerTwitterTimeline()
+
+#### TSLAFollowerSelect ####
+#Se seleccionan los usuarios que tengan almenos 15000 statuses (tweets) 
+TSLAFollowerSelect <- function(){
+  if(file.exists("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")){
+    source("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")
+    TSLATFollowerSelect.df <- TSLAFollowerSelect.Clean(TSLATFollowerTwitterTimeline.df)
+  }
+  return(TSLATFollowerSelect.df)
+}
+TSLATFollowerSelect.df <- TSLAFollowerSelect()
+
+
+
+
+
+
+
 
