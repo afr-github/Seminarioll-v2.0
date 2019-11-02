@@ -5,6 +5,8 @@
   if(file.exists("RSetup.R")){
     source("RSetup.R")
     cargarlibrerias()
+    cargarConexion()
+    TSLATwitterTimelineSearch()
   }
   
   #function in file
