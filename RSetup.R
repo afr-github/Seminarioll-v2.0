@@ -39,7 +39,7 @@ cargarLibrerias <- function(){
   paqueteriasRequeridas <- c("twitteR", "rtweet", "influenceR", 
                              "igraph", "SentimentAnalysis", 
                              "syuzhet", "quanteda", "devtools", "remotes",
-                             "tweetbotornot")
+                             "tweetbotornot", "tm")
   
   tryCatch({
       for(i in 1:length(paqueteriasRequeridas)){
