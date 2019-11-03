@@ -151,19 +151,39 @@ TSLAFollowerTweets <- function(){
 }
 TSLAFollowerTweets.df <- TSLAFollowerTweets()
 
-#### SentimentAnalysis Tesla ####
-TSLASentimentAnalysis <- function(){
+#### SentimentAnalysis Tesla (Procesamiento) ####
+TSLASentimentAnalysis.ProcesarCorpus <- function(){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
     source("SentimentAnalysis/Sentiment Analysis.R")
-      TSLASentimentAnalysis.df <- TSLASentimentAnalysis.Procesar()
+    TSLATwitterTimeline.df.SA.PC <- TSLASentimentAnalysis.Procesar()
   }
+  return(TSLATwitterTimeline.df.SA.PC)
 }
-TSLASentimentAnalysis.df <- TSLASentimentAnalysis()
+TSLATwitterTimeline.df.SA.PC <- TSLASentimentAnalysis.ProcesarCorpus()
+
+
+#### SentimentAnalysis Tesla (Transformación)
+TSLASentimentAnalysis.TransformarCorpus <- function(){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")
+    TSLATwitterTimeline.df.SA.TC <- TSLASentimentAnalysis.Transformar(TSLATwitterTimeline.df.SA.PC)
+  }
+  return(TSLATwitterTimeline.df.SA.TC)
+}
+TSLATwitterTimeline.df.SA.TC <- TSLASentimentAnalysis.TransformarCorpus()
+
+
+TSLATwitterTimeline.df.corpus.df <- TSLASentimentAnalysis.Transformar()
+#TSLATwitterTimeline.SentimentAnalysis <- TSLASentimentAnalysis.SentimentAnalysis(
+#  corpus = TSLATwitterTimeline.df.corpus,
+#  corpus.df = TSLATwitterTimeline.df.corpus.df
+#)
+
 
 
 
 #### SentimentAnalysis Followers ####
-TSLAFollowersSentimentAnalyiss <- function(){
+TSLAFollowersSentimentAnalysis <- function(){
   
 }
 
