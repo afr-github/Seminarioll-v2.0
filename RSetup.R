@@ -152,8 +152,20 @@ TSLAFollowerTweets <- function(){
 TSLAFollowerTweets.df <- TSLAFollowerTweets()
 
 #### SentimentAnalysis Tesla ####
+TSLASentimentAnalysis <- function(){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")
+      TSLASentimentAnalysis.df <- TSLASentimentAnalysis.Procesar()
+  }
+}
+TSLASentimentAnalysis.df <- TSLASentimentAnalysis()
 
 
+
+#### SentimentAnalysis Followers ####
+TSLAFollowersSentimentAnalyiss <- function(){
+  
+}
 
 
 

@@ -1,18 +1,52 @@
 #Sentiment Analisis 
 
 #Tesla Twitter Timeline
-TSLATwitterTimeline.df
+#Aqui se realiza todo el proceso del procesado del texto
+TSLASentimentAnalysis.Procesar <- function(){
+  TSLATwitterTimeline.df.corpus <- VCorpus(VectorSource(TSLATwitterTimeline.df$text))
+  
+  TSLATwitterTimeline.df.SA <- SentimentAnalysis::preprocessCorpus(
+    corpus = TSLATwitterTimeline.df.corpus,
+    language = "english",
+    stemming = TRUE,
+    removeStopwords = TRUE
+  )
+  
+  TSLATwitterTimeline.df.corpus <- tm_map(
+    x = TSLATwitterTimeline.df.corpus,
+    FUN = content_transformer(tolower)
+  )
+  
+  TSLATwitterTimeline.df.corpus.df <- data.frame(
+    text = sapply(
+      X = TSLATwitterTimeline.df.corpus,
+      FUN = as.character
+    ),
+    stringsAsFactors = FALSE
+  )
 
-TSLATwitterTimeline.df.corpus <- VCorpus(VectorSource(TSLATwitterTimeline.df$text))
+  
+  #Dont run just yet
+  TSLATwitterTimeline.df.corpus <- sub(
+    pattern = "rt",
+    replacement = '',
+    x = TSLATwitterTimeline.df.corpus
+  )
+  
+  View(TSLATwitterTimeline.df.corpus)
+  
+  return()#Objeto con loa información del corpus en data.frame
+}
 
-TSLATwitterTimeline.df.SA <- SentimentAnalysis::preprocessCorpus(
-  corpus = TSLATwitterTimeline.df.corpus,
-  language = "english",
-  stemming = TRUE,
-  removeStopwords = TRUE
-)
 
-TSLATwitterTimeline.df.AS <- analyzeSentiment(TSLATwitterTimeline.df.corpus)
+
+
+
+
+
+
+
+#ERROR TSLATwitterTimeline.df.AS <- analyzeSentiment(TSLATwitterTimeline.df.corpus)
 
 View(TSLATwitterTimeline.df.SA)
 
