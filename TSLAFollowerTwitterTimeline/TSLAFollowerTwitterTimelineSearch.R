@@ -64,24 +64,137 @@ TSLAFollowerSelect.Clean <- function(x){
 }
 
 #### Se busca cuales Followers son Bots ####
-TSLAFollowerBots.Search <- function(x){
-  TSLATFollowerTwitterTimeline.df <- x
+TSLAFollowerBots.Search <- function(){
   
-  for(i in 1:length(TSLATFollowerSelect.df$screenName)){
-      if(exists("TSLAFollowerBots.df")){
-        TSLAFollowerBots.df <- tweetbotornot::tweetbotornot(
-          x = TSLATFollowerTwitterTimeline.df$screenName[i,i+150]
-        )
-        i <- (i+150)
-        Sys.sleep(16*60)
-      } else{
-        ##Append what already exists into the continuance of the same variable to able 
-        # create the file at the end.
+  tryCatch(
+    {
+      i <- 1
+      while(i < 151){
+        if(exists("TSLAFollowerBots.df")){
+          TSLAFollowerBots.df.TEMP <- read.csv(
+            file = "TSLAFollowerTwitterTimeline/TSLAFollowerBots.csv"
+          )
+          TSLAFollowerBots.df <- tweetbotornot::tweetbotornot(
+            x = TSLATFollowerTwitterTimeline.df$screenName[i:(i+150)],
+            fast = FALSE
+          )
+          i <- (i+150)
+          TSLAFollowerBots.df.TEMP <- rbind(TSLAFollowerBots.df.TEMP,TSLAFollowerBots.df)
+          TSLAFollowerBots.df <- TSLAFollowerBots.df.TEMP
+          write.csv(
+            x = TSLAFollowerBots.df,
+            file = "TSLAFollowerTwitterTimeline/TSLAFollowerBots.csv"
+          )
+          #Sys.sleep(16*60)
+        }else{
+          TSLAFollowerBots.df <- tweetbotornot::tweetbotornot(
+            x = TSLATFollowerTwitterTimeline.df$screenName[i:(i+150)],
+            fast = FALSE
+          )
+          i <- (i+150)
+          write.csv(
+            x = TSLAFollowerBots.df,
+            file = "TSLAFollowerTwitterTimeline/TSLAFollowerBots.csv"
+          )
+          #Sys.sleep(16*60)
+        }
       }
-  }
-
-
+    },
+    error = function(cond){
+      TSLAFollowerBots.df.TEMP <- read.csv(
+        file = "TSLAFollowerTwitterTimeline/TSLAFollowerBots.csv"
+      )
+        
+      TSLAFollowerBots.df <- tweetbotornot::tweetbotornot(
+        x = TSLATFollowerTwitterTimeline.df$screenName[i:i+150],
+        fast = FALS
+      )
+      i <- (i+150)
+      TSLAFollowerBots.df.TEMP <- rbind(TSLAFollowerBots.df.TEMP,TSLAFollowerBots.df)
+      TSLAFollowerBots.df <- TSLAFollowerBots.df.TEMP
+      write.csv(
+        x = TSLAFollowerBots.df,
+        file = "TSLAFollowerTwitterTimeline/TSLAFollowerBots.csv"
+      )
+      #Sys.sleep(16*60)
   
+    }
+  )
+  
+}
+
+#### Se agarran los followers dentro de los parametros ####
+TSLAFollowerBots.Select <- function(){
+  TSLAFollowerBots.df <- read.csv(
+    file = "TSLAFollowerTwitterTimeline/TSLAFollowerBots.csv"
+  )
+  
+  TSLAFollowerBots.df <- subset(
+    x = TSLAFollowerBots.df,
+    subset = prob_bot <.5
+  )
+  
+  TSLAFollowerBots.df <- subset(
+    x = TSLAFollowerBots.df,
+    select = c("screen_name","user_id", "prob_bot")
+  )
+  
+  write.csv(
+    x = TSLAFollowerBots.df,
+    file = "TSLAFollowerTwitterTimeline/TSLAFollowerBots.csv"
+  )
+  
+  return(TSLAFollowerBots.df)
+}
+
+#### Se agarraron los statuses de los followers que no se consideran como bots ####
+TSLAFollowerTweets.Search <- function(id){
+  if(exists("TSLAFollowerTweets.df")){
+    temp <- read.csv(
+      file = "TSLAFollowerTwitterTimeline/TSLAFollowerTweets.csv",
+      stringsAsFactors = FALSE
+    )
+    
+    id <- setdiff(id, unique(temp$screenName))
+    
+    TSLAFollowerTweets.df <- twitteR::userTimeline(
+      user = id,
+      n = 3200,
+      includeRts = TRUE,
+      excludeReplies = FALSE,
+      Sys.sleep(120)
+    )
+    temp <- rbind(temp, TSLAFollowerTweets.df)
+    TSLAFollowerTweets.df <- temp
+    
+  }else{
+    TSLAFollowerTweets.df <- twitteR::userTimeline(
+      user = id,
+      n = 3200,
+      includeRts = TRUE,
+      excludeReplies = FALSE,
+      Sys.sleep(120)
+    )
+  }
+  
+  TSLAFollowerTweets.df <- twitteR::twListToDF(TSLAFollowerTweets.df)
+  
+  write.csv(
+    x = TSLAFollowerTweets.df,
+    file = "TSLAFollowerTwitterTimeline/TSLAFollowerTweets.csv"
+  )
+  
+  return(TSLAFollowerTweets.df)
+}
+
+#### Se agarran los tweets de los follower y se cargan ####
+TSLAFollowerTweets.Load <- function(){
+  TSLAFollowerTweets.df <- read.csv(
+    file = "TSLAFollowerTwitterTimeline/TSLAFollowerTweets.csv",
+    stringsAsFactors = FALSE
+  )
+  
+  return(TSLAFollowerTweets.df)
 }
 
 
@@ -89,6 +202,24 @@ TSLAFollowerBots.Search <- function(x){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+TSLAFollowerTweets.Clean <- function(df){
+  TSLAFollowerTweets.df <- df
+  
+  
+  
+  
+}
 
 
 

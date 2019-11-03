@@ -129,6 +129,39 @@ TSLAFollowerSelect <- function(){
 }
 TSLATFollowerSelect.df <- TSLAFollowerSelect()
 
+#### TSLAFollowerBots ####
+#Se eliminan los usuario que tienen mas de .5% de probabilidad de ser bots
+TSLAFollowerBot <- function(){
+  if(file.exists("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")){
+    source("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")
+    TSLAFollowerBots.df <- TSLAFollowerBots.Select()  
+  }
+  return(TSLAFollowerBots.df)
+}
+TSLAFollowerBots.df <- TSLAFollowerBot()
+
+
+#### TSLAFollowersTweets ####
+#Todos los tweets de los Followers que cumplieron con los requisitos
+TSLAFollowerTweets <- function(){
+  if(file.exists("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")){
+    source("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")
+    TSLAFollowerTweets.df <- TSLAFollowerTweets.Load()
+  }
+}
+TSLAFollowerTweets.df <- TSLAFollowerTweets()
+
+#### SentimentAnalysis Tesla ####
+
+
+
+
+
+
+
+
+
+
 
 
 
