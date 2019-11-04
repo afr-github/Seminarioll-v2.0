@@ -196,30 +196,3 @@ TSLAFollowerTweets.Load <- function(){
   
   return(TSLAFollowerTweets.df)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-TSLAFollowerTweets.Clean <- function(df){
-  TSLAFollowerTweets.df <- df
-  
-  
-  
-  
-}
-
-
-

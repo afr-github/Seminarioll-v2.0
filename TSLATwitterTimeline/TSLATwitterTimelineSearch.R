@@ -33,7 +33,7 @@ TSLATwitterTimeline.Search.fechas <- function(){
     file_name = "TSLATwitterTimeline/TSLATwitterTimelineSearchData.csv",
     prepend_ids = FALSE
   )
- 
+  
  return(temp)
 }
 
@@ -67,6 +67,8 @@ TSLATwitterTimeline.Search.df.columnas <- c("user_id", "status_id", "created_at"
 
 #### Cargar tweets ####
 TSLATwitterTimeline.Load <- function(){
+  TSLATwitterTimeline.Search.limpieza(TSLATwitterTimeline.Search.fechas())
+  
   TSLATwitterTimeline.df <- read.csv(
     file = "TSLATwitterTimeline/TSLATwitterTimelineSearchData.csv",
     stringsAsFactors = FALSE

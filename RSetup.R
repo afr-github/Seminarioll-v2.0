@@ -1,67 +1,27 @@
 #Rsetup file
 
-#### Checar si existe .Rprofile documento ####
-if(file.exists(".Rprofile")){
-  #Leer archvio RprofileSetup.txt, transcribir lo a .Rprofile y resetear 
-  #para que tomen efecto los cambios realizados.
-  if(file.exists("RprofileSetup.txt")){
-    source("~/RprofileSetup.txt")
-    cat("Archivo ya fue creado/cargado\n")
-    file.copy(from = "RprofileSetup.txt", to = ".Rprofile", overwrite = TRUE)
-    cat("File read\n")
-  }else{
-    file.choose()
-    cat("Archivo creado\n")
-    file.copy(from = "RprofileSetup.txt", to = ".Rprofile", overwrite = TRUE)
-    cat("Archivo leido")
-  }
-}else{
-  cat("Creando Archivo.\n")
-  file.create(file.path(getwd(), ".Rprofile"))
-  cat("Archivo creado.\n")
-  if(file.exists("RprofileSetup.txt")){
-    source("~/RprofileSetup.txt")
-    cat("Archivo ya fue creado/cargado\n")
-    file.copy(from = "RprofileSetup.txt", to = ".Rprofile", overwrite = TRUE)
-    cat("Archivo leido\n")
-  }else{
-    file.choose()
-    cat("Archivo obtenido\n")
-    file.copy(from = "RprofileSetup.txt", to = ".Rprofile", overwrite = TRUE)
-    cat("Archivo leido")
-  }
-}
-
-#Reiniciar session
-
 #### Cargar librerias requeridas ####
 cargarLibrerias <- function(){
   paqueteriasRequeridas <- c("twitteR", "rtweet", "influenceR", 
                              "igraph", "SentimentAnalysis", 
                              "syuzhet", "quanteda", "devtools", "remotes",
-                             "tweetbotornot", "tm")
+                             "tweetbotornot", "tm", "tidytext", "dplyr",
+                             "ggplot2", "tibble")
   
   tryCatch({
-      for(i in 1:length(paqueteriasRequeridas)){
-        
-        #check if the paqueteria is installed not loaded, it won't be loaded
-        if(require(paqueteriasRequeridas[i],character.only = TRUE)){
-          cat(sub(pattern = "[i]", replacement = paqueteriasRequeridas[i], x = "Paquete [i] ha sido cargado.\n"))
-        }else{
-          cat(sub(pattern = "[i]", replacement = paqueteriasRequeridas[i], x = "Paquete [i] no esta cargado.\n"))
-          install.packages(paqueteriasRequeridas[i])
-          require(paqueteriasRequeridas[i],character.only = TRUE)
-          cat(sub(pattern = "[i]", replacement = paqueteriasRequeridas[i], x = "Paquete [i] ha sido cargado.\n"))
-        }
-      }
-    },
-    error = function(cond){
-      ## install tweetbotornot from github
-      devtools::install_github("mkearney/tweetbotornot",force = TRUE)
+    for(i in 1:length(paqueteriasRequeridas)){
       
-      # To fix `by` [ERROR] with newer version of textfeatures
-      devtools::install_version('textfeatures', version='0.2.0', repos='http://cran.us.r-project.org')
+      #check if the paqueteria is installed not loaded, it won't be loaded
+      if(require(paqueteriasRequeridas[i],character.only = TRUE)){
+        cat(sub(pattern = "[i]", replacement = paqueteriasRequeridas[i], x = "Paquete [i] ha sido cargado.\n"))
+      }else{
+        cat(sub(pattern = "[i]", replacement = paqueteriasRequeridas[i], x = "Paquete [i] no esta cargado.\n"))
+        install.packages(paqueteriasRequeridas[12])
+        require(paqueteriasRequeridas[i],character.only = TRUE)
+        cat(sub(pattern = "[i]", replacement = paqueteriasRequeridas[i], x = "Paquete [i] ha sido cargado.\n"))
+      }
     }
+  }
   )
 }
 cargarLibrerias()
@@ -92,7 +52,7 @@ cargarConexion <- function(){
     #rtweet access when token already generated
     get_token()
   }
-
+  
 }
 cargarConexion()
 
@@ -101,7 +61,7 @@ cargarConexion()
 TSLATwitterTimeline <- function(){
   if(file.exists("TSLATwitterTimeline/TSLATwitterTimelineSearch.R")){
     source("TSLATwitterTimeline/TSLATwitterTimelineSearch.R")
-      TSLATwitterTimeline.df <- TSLATwitterTimeline.Load()
+    TSLATwitterTimeline.df <- TSLATwitterTimeline.Load()
   }
   return(TSLATwitterTimeline.df)
 }
@@ -140,7 +100,6 @@ TSLAFollowerBot <- function(){
 }
 TSLAFollowerBots.df <- TSLAFollowerBot()
 
-
 #### TSLAFollowersTweets ####
 #Todos los tweets de los Followers que cumplieron con los requisitos
 TSLAFollowerTweets <- function(){
@@ -148,6 +107,7 @@ TSLAFollowerTweets <- function(){
     source("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")
     TSLAFollowerTweets.df <- TSLAFollowerTweets.Load()
   }
+  return(TSLAFollowerTweets.df[4:length(TSLAFollowerTweets.df)])
 }
 TSLAFollowerTweets.df <- TSLAFollowerTweets()
 
@@ -155,29 +115,84 @@ TSLAFollowerTweets.df <- TSLAFollowerTweets()
 TSLASentimentAnalysis.ProcesarCorpus <- function(){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
     source("SentimentAnalysis/Sentiment Analysis.R")
-    TSLATwitterTimeline.df.SA.PC <- TSLASentimentAnalysis.Procesar()
+      TSLATwitterTimeline.df.SA.PC <- TSLASentimentAnalysis.Procesar(
+        dfText = TSLATwitterTimeline.df
+      )
   }
   return(TSLATwitterTimeline.df.SA.PC)
 }
 TSLATwitterTimeline.df.SA.PC <- TSLASentimentAnalysis.ProcesarCorpus()
 
-
-#### SentimentAnalysis Tesla (Transformación)
+#### SentimentAnalysis Tesla (Transformación) ####
 TSLASentimentAnalysis.TransformarCorpus <- function(){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
     source("SentimentAnalysis/Sentiment Analysis.R")
-    TSLATwitterTimeline.df.SA.TC <- TSLASentimentAnalysis.Transformar(TSLATwitterTimeline.df.SA.PC)
+    TSLATwitterTimeline.df.SA.TC <- TSLASentimentAnalysis.Transformar(
+      xCorpus = TSLATwitterTimeline.df.SA.PC
+    )
   }
   return(TSLATwitterTimeline.df.SA.TC)
 }
 TSLATwitterTimeline.df.SA.TC <- TSLASentimentAnalysis.TransformarCorpus()
 
+#### Inyectar TSLATwitterTimeline.df.SA.TC en TSLATwitterTimeline.df$text ####
+TSLATwitterTimeline.df$text <- TSLATwitterTimeline.df.SA.TC$text
 
-TSLATwitterTimeline.df.corpus.df <- TSLASentimentAnalysis.Transformar()
-#TSLATwitterTimeline.SentimentAnalysis <- TSLASentimentAnalysis.SentimentAnalysis(
-#  corpus = TSLATwitterTimeline.df.corpus,
-#  corpus.df = TSLATwitterTimeline.df.corpus.df
-#)
+#### SentimentAnalysis Tesla ####
+TSLASentimentAnalysis <- function(){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")
+    TSLATwitterTimeline.df.SA.df <- TSLASentimentAnalysis.SentimentAnalysis.s(
+      xCorpus = TSLATwitterTimeline.df.SA.PC
+    )
+  }
+  return(TSLATwitterTimeline.df.SA.df)
+}
+TSLATwitterTimeline.df.SA.df <- TSLASentimentAnalysis()
+#View(TSLATwitterTimeline.df.SA.df)
+
+#### SentimentAnalysis Tesla Top Words ####
+TSLASentimentAnalysis.top <- function(){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")
+    TSLATwitterTimeline.df.SA.df <- TSLASentimentAnalysis.SentimentAnalysis.top(
+      xDataFrame = TSLATwitterTimeline.df,
+      cant = 10 #Recomended 20
+    )
+  }
+  return(TSLATwitterTimeline.df.SA.df)
+}
+TSLASentimentAnalysis.top()
+
+#### SentimentAnalyis Tesla Union Sentiment ####
+TSLATwitterTimeline.df.SA.union <- function(){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")  
+      TSLATwitterTimeline.df.SA.U <- UnionTablas()
+  }
+  return(TSLATwitterTimeline.df.SA.U)
+}
+TSLATwitterTimeline.df.SA.U <- TSLATwitterTimeline.df.SA.union()
+
+#### SentimentAnalysis Tesla Identificación Mensual ####
+TSLATwitterTimeline.df.SA.imensual <- function(){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")  
+    TSLATwitterTimeline.df.SA.im <- IdentificacionMensual()
+  }
+  return(TSLATwitterTimeline.df.SA.im)
+}
+TSLATwitterTimeline.df.SA.im <- TSLATwitterTimeline.df.SA.imensual()
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -186,18 +201,4 @@ TSLATwitterTimeline.df.corpus.df <- TSLASentimentAnalysis.Transformar()
 TSLAFollowersSentimentAnalysis <- function(){
   
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
