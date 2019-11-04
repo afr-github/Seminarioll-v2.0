@@ -138,68 +138,95 @@ UnionTablas <- function(){
   return(TSLATwitterTimeline.df.SA.U)
 }
 
-
-
-#Hasta aqui
-IdentificacionMensual <- function(){
-  meses <- as.Date(
-    c("2014/06/01", "2014/07/01", "2014/08/01", "2014/09/01", "2014/10/01", "2014/11/01", "2014/12/01", "2015/01/01", "2015/02/01", "2015/03/01", "2015/04/01",
-      "2015/05/01", "2015/06/01", "2015/07/01", "2015/08/01", "2015/09/01", "2015/10/01", "2015/11/01", "2015/12/01", "2016/01/01", "2016/02/01", "2016/03/01",
-      "2016/04/01", "2016/05/01", "2016/06/01", "2016/07/01", "2016/08/01", "2016/09/01", "2016/10/01", "2016/11/01", "2016/12/01", "2017/01/01", "2017/02/01",
-      "2017/03/01", "2017/04/01", "2017/05/01", "2017/06/01", "2017/07/01", "2017/08/01", "2017/09/01", "2017/10/01", "2017/11/01", "2017/12/01", "2018/01/01",
-      "2018/02/01", "2018/03/01", "2018/04/01", "2018/05/01", "2018/06/01", "2018/07/01", "2018/08/01", "2018/09/01", "2018/10/01", "2018/11/01", "2018/12/01",
-      "2019/01/01", "2019/02/01", "2019/03/01", "2019/04/01", "2019/05/01", "2019/06/01"
-    )
-  )
-  
+#Identificación del rango de fecha en que se esta interesado
+IdentificacionMensual <- function(fecha1, fecha2){
   TSLATwitterTimeline.df.SA.U.TEMP <- TSLATwitterTimeline.df.SA.U
   
   TSLATwitterTimeline.df.SA.U.TEMP$created_at <- as.Date(
     x = TSLATwitterTimeline.df.SA.U$created_at,
     optional = FALSE
   )
-  #2014/06/01
-  fecha20140601 <- data.frame(
-    text = sapply(
-      X = subset(
-        x = TSLATwitterTimeline.df.SA.U.TEMP,
-        subset = (TSLATwitterTimeline.df.SA.U.TEMP$created_at > meses[1]) &
-          (TSLATwitterTimeline.df.SA.U.TEMP$created_at <= meses[2])
-      ),
-      FUN = as.character
+  
+  TSLATwitterTimeline.df.SA.U.TEMP <- data.frame(
+    subset(
+      x = TSLATwitterTimeline.df.SA.U.TEMP,
+      subset = (TSLATwitterTimeline.df.SA.U.TEMP$created_at > as.Date(fecha1, tryFormat = "%d/%m/%Y")) &
+               (TSLATwitterTimeline.df.SA.U.TEMP$created_at <= as.Date(fecha2, tryFormat = "%d/%m/%Y"))
     ),
     stringsAsFactors = FALSE
   )
-  #2014/07/01
-  fecha20140701 <- data.frame(
-    text = sapply(
-      X = subset(
-        x = TSLATwitterTimeline.df.SA.U.TEMP,
-        subset = (TSLATwitterTimeline.df.SA.U.TEMP$created_at > meses[2]) &
-          (TSLATwitterTimeline.df.SA.U.TEMP$created_at <= meses[3])
-      ),
-      FUN = as.character
-    ),
+
+  return(TSLATwitterTimeline.df.SA.U.TEMP)
+}
+
+
+Resultados <- function(rango){
+  rango <- TSLATwitterTimeline.df.SA.im
+  
+  TSLAStockData.TEMP <- read.csv(
+    file = "TSLAStockData/TSLAStockData.csv",
     stringsAsFactors = FALSE
   )
-  #2014/08/01
-  fecha20140801 <- data.frame(
-    text = sapply(
-      X = subset(
-        x = TSLATwitterTimeline.df.SA.U.TEMP,
-        subset = (TSLATwitterTimeline.df.SA.U.TEMP$created_at > meses[3]) &
-          (TSLATwitterTimeline.df.SA.U.TEMP$created_at <= meses[4])
-      ),
-      FUN = as.character
-    ),
-    stringsAsFactors = FALSE
-    
-    #por que no medir el sentimiento con los mismos parametros por el mes en el que estas interesado, envez de crear tantas variables.
-    #la variables [meses] esta bien, pero hay que empezar a analizar el texto para ver el sentimiento de cada mes y ver como se relacióna
-    #con los movimientos en la bolsa de valores.
+  
+  TSLAStockData.TEMP <- TSLAStockData.TEMP[,1:7]
+  
+  fecha1 <- min(rango$created_at)
+  fecha2 <- max(rango$created_at)
+  
+  TSLAStockData.TEMP$Date <- as.Date(TSLAStockData.TEMP$Date, tryFormats = "%d/%m/%Y")
+  fecha1 <- as.Date(fecha1, tryFormats = "%Y/%m/%d")
+  fecha2 <- as.Date(fecha2, tryFormats = "%d/%m/%Y")
+  
+  TSLAStockData.TEMP <- subset(
+    x = TSLAStockData.TEMP,
+    subset = (TSLAStockData.TEMP$Date > as.Date(fecha1, tryFormats = "%d/%m/%Y")) &
+             (TSLAStockData.TEMP$Date <= as.Date(fecha2, tryFormats = "%d/%m/%Y"))
+  )
+  
+  for(i in 1:length(TSLAStockData.TEMP$Date)){
+    if(length(rango$created_at == TSLAStockData.TEMP$Date[i]) > 0){
+      #buscar por dia la cantidad de cada tipo de sentimiento que tiene
+    }else{
+      
+    }else{
+      
+    } 
+  }
+  
+  
+  
+  TSLAStockData.TEMP.fechas <- as.character(
+    x =  c(
+      TSLAStockData.TEMP$Date,
+      "Sentimiento Positivo" = SP,
+      "Sentimiento Neutro" = SN,
+      "Sentimiento Negativo" = SNeg
+    )
+  )
+  
+  
+  View(TSLAStockData.TEMP.fechas)
+  
+  View(rango)
+  View(TSLAStockData.TEMP)
+  
+  #unir los diferentes sentimientos que existen en la tabla por fechas ej. 2014/06/09 : 5 positivo, 3 neutro, 2 negativo
+  #comparar con precio de las acciones - 2014/06/09: open 229.4 - close - 232.3
+  
+  
+  
+  #No coicide la cantidad de filas [mas filas de rango$sentiminet]
+  TSLAStockData.TEMP <- add_column(
+    .data = TSLAStockData.TEMP,
+    rango$Sentiment,
+    .after = 7
   )
   
 }
+
+#por que no medir el sentimiento con los mismos parametros por el mes en el que estas interesado, envez de crear tantas variables.
+#la variables [meses] esta bien, pero hay que empezar a analizar el texto para ver el sentimiento de cada mes y ver como se relacióna
+#con los movimientos en la bolsa de valores.
 
 
 

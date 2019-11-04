@@ -175,19 +175,29 @@ TSLATwitterTimeline.df.SA.union <- function(){
 TSLATwitterTimeline.df.SA.U <- TSLATwitterTimeline.df.SA.union()
 
 #### SentimentAnalysis Tesla Identificación Mensual ####
-TSLATwitterTimeline.df.SA.imensual <- function(){
+TSLATwitterTimeline.df.SA.imensual <- function(fecha1, fecha2){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
     source("SentimentAnalysis/Sentiment Analysis.R")  
-    TSLATwitterTimeline.df.SA.im <- IdentificacionMensual()
+    TSLATwitterTimeline.df.SA.im <- IdentificacionMensual(fecha1 = fecha1, fecha2 = fecha2)
   }
   return(TSLATwitterTimeline.df.SA.im)
 }
-TSLATwitterTimeline.df.SA.im <- TSLATwitterTimeline.df.SA.imensual()
+
+#Rango de fechas permitidas
+#01/06/2014 - 05/31/2019
+TSLATwitterTimeline.df.SA.im <- TSLATwitterTimeline.df.SA.imensual("01/06/2014", "20/06/2014")
+View(TSLATwitterTimeline.df.SA.im)
 
 
-
-
-
+#### SentimentAnalysis Tesla Resultado ####
+TSLATwitterTimeline.df.SA.resultdo <- function(rango){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")  
+    TSLATwitterTimeline.df.SA.r <- Resultados(rango = rango)
+  }
+  return(TSLATwitterTimeline.df.SA.r)
+}
+TSLATwitterTimeline.df.SA.r <- TSLATwitterTimeline.df.SA.resultdo(TSLATwitterTimeline.df.SA.im)
 
 
 
