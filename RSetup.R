@@ -66,6 +66,7 @@ TSLATwitterTimeline <- function(){
   return(TSLATwitterTimeline.df)
 }
 TSLATwitterTimeline.df <- TSLATwitterTimeline()
+#View(TSLATwitterTimeline.df)
 
 #### TSLAFollowerTwitterTimeline ####
 #Se carga el archvivo con los Followers de Tesla
@@ -77,6 +78,7 @@ TSLAFollowerTwitterTimeline <- function(){
   return(TSLATFollowerTwitterTimeline.df)
 }
 TSLATFollowerTwitterTimeline.df <- TSLAFollowerTwitterTimeline()
+#View(TSLATFollowerTwitterTimeline.df)
 
 #### TSLAFollowerSelect ####
 #Se seleccionan los usuarios que tengan almenos 15000 statuses (tweets) 
@@ -99,6 +101,7 @@ TSLAFollowerBot <- function(){
   return(TSLAFollowerBots.df)
 }
 TSLAFollowerBots.df <- TSLAFollowerBot()
+#View(TSLAFollowerBots.df)
 
 #### TSLAFollowersTweets ####
 #Todos los tweets de los Followers que cumplieron con los requisitos
@@ -110,14 +113,15 @@ TSLAFollowerTweets <- function(){
   return(TSLAFollowerTweets.df[4:length(TSLAFollowerTweets.df)])
 }
 TSLAFollowerTweets.df <- TSLAFollowerTweets()
+#View(TSLAFollowerTweets.df)
 
 #### SentimentAnalysis Tesla (Procesamiento) ####
 TSLASentimentAnalysis.ProcesarCorpus <- function(){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
     source("SentimentAnalysis/Sentiment Analysis.R")
-      TSLATwitterTimeline.df.SA.PC <- TSLASentimentAnalysis.Procesar(
-        dfText = TSLATwitterTimeline.df
-      )
+    TSLATwitterTimeline.df.SA.PC <- TSLASentimentAnalysis.Procesar(
+      dfText = TSLATwitterTimeline.df
+    )
   }
   return(TSLATwitterTimeline.df.SA.PC)
 }
@@ -168,7 +172,7 @@ TSLASentimentAnalysis.top()
 TSLATwitterTimeline.df.SA.union <- function(){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
     source("SentimentAnalysis/Sentiment Analysis.R")  
-      TSLATwitterTimeline.df.SA.U <- UnionTablas()
+    TSLATwitterTimeline.df.SA.U <- UnionTablas()
   }
   return(TSLATwitterTimeline.df.SA.U)
 }
@@ -185,7 +189,7 @@ TSLATwitterTimeline.df.SA.imensual <- function(fecha1, fecha2){
 
 #Rango de fechas permitidas
 #01/06/2014 - 05/31/2019
-TSLATwitterTimeline.df.SA.im <- TSLATwitterTimeline.df.SA.imensual("01/06/2014", "20/06/2014")
+TSLATwitterTimeline.df.SA.im <- TSLATwitterTimeline.df.SA.imensual("01/06/2014", "31/05/2019")
 View(TSLATwitterTimeline.df.SA.im)
 
 
@@ -198,9 +202,10 @@ TSLATwitterTimeline.df.SA.resultdo <- function(rango){
   return(TSLATwitterTimeline.df.SA.r)
 }
 TSLATwitterTimeline.df.SA.r <- TSLATwitterTimeline.df.SA.resultdo(TSLATwitterTimeline.df.SA.im)
+View(TSLATwitterTimeline.df.SA.r)
 
-
-
+#Cuando el precio de cierre termina menor que el precio de apertura existen mas sentimientos negativos y neutros que positivos
+#628 registos
 
 
 
@@ -211,4 +216,3 @@ TSLATwitterTimeline.df.SA.r <- TSLATwitterTimeline.df.SA.resultdo(TSLATwitterTim
 TSLAFollowersSentimentAnalysis <- function(){
   
 }
-

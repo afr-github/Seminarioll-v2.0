@@ -159,17 +159,15 @@ IdentificacionMensual <- function(fecha1, fecha2){
   return(TSLATwitterTimeline.df.SA.U.TEMP)
 }
 
-
+#Union entre los movimientos de la bolsa de valores y el sentimiento
 Resultados <- function(rango){
-  rango <- TSLATwitterTimeline.df.SA.im
-  
   TSLAStockData.TEMP <- read.csv(
     file = "TSLAStockData/TSLAStockData.csv",
     stringsAsFactors = FALSE
   )
-  
+
   TSLAStockData.TEMP <- TSLAStockData.TEMP[,1:7]
-  
+
   fecha1 <- min(rango$created_at)
   fecha2 <- max(rango$created_at)
   
@@ -183,62 +181,148 @@ Resultados <- function(rango){
              (TSLAStockData.TEMP$Date <= as.Date(fecha2, tryFormats = "%d/%m/%Y"))
   )
   
+  SP <- data.frame(Fecha = as.Date(c(""), format = "%d/%m/%Y"), Cant = "", stringsAsFactors = FALSE) 
+  SN <- data.frame(Fecha = as.Date(c(""), format = "%d/%m/%Y"), Cant = "", stringsAsFactors = FALSE) 
+  SNeg <- data.frame(Fecha = as.Date(c(""), format = "%d/%m/%Y"), Cant = "", stringsAsFactors = FALSE) 
+  
+  #identificación de dias positivos, neutros o negativos
   for(i in 1:length(TSLAStockData.TEMP$Date)){
-    if(length(rango$created_at == TSLAStockData.TEMP$Date[i]) > 0){
-      #buscar por dia la cantidad de cada tipo de sentimiento que tiene
-    }else{
+    if(length(rango$Sentiment[TSLAStockData.TEMP$Date[i] == rango$created_at]) > 0){
+      val <- (rango$Sentiment[TSLAStockData.TEMP$Date[i] == rango$created_at] == "positive")
+      SP <- add_row(SP, Fecha = unique(rango$created_at[TSLAStockData.TEMP$Date[i] == rango$created_at]), Cant = length(val[val == TRUE]))
       
-    }else{
+      val2 <- (rango$Sentiment[TSLAStockData.TEMP$Date[i] == rango$created_at] == "neutral")
+      SN <- add_row(SN, Fecha = unique(rango$created_at[TSLAStockData.TEMP$Date[i] == rango$created_at]), Cant = length(val2[val2 == TRUE]))
       
-    } 
+      val3 <- (rango$Sentiment[TSLAStockData.TEMP$Date[i] == rango$created_at] == "negative")
+      SNeg <- add_row(SNeg, Fecha = unique(rango$created_at[TSLAStockData.TEMP$Date[i] == rango$created_at]), Cant = length(val3[val3 == TRUE]))
+    }
   }
   
+  SP <- SP[2:length(SP$Cant),]
+  SN <- SN[2:length(SN$Cant),]
+  SNeg <- SNeg[2:length(SNeg$Cant),]
   
-  
-  TSLAStockData.TEMP.fechas <- as.character(
-    x =  c(
-      TSLAStockData.TEMP$Date,
-      "Sentimiento Positivo" = SP,
-      "Sentimiento Neutro" = SN,
-      "Sentimiento Negativo" = SNeg
-    )
+  #Data frame con las fechas y resultados
+  TSLAStockData.TEMP.S <- data.frame(
+    Fecha = c(SP$Fecha),
+    Sentimiento_Positivo = c(SP$Cant),
+    Sentimiento_Neutro = c(SN$Cant),
+    Sentimiento_Negativo = c(SNeg$Cant),
+    stringsAsFactors = FALSE
   )
   
+  #Union de los datos recopilados por 
+  names(TSLAStockData.TEMP) <- c("Fecha","Open","High","Low","Close", "Adj.Close", "Volume")
   
-  View(TSLAStockData.TEMP.fechas)
-  
-  View(rango)
-  View(TSLAStockData.TEMP)
-  
-  #unir los diferentes sentimientos que existen en la tabla por fechas ej. 2014/06/09 : 5 positivo, 3 neutro, 2 negativo
-  #comparar con precio de las acciones - 2014/06/09: open 229.4 - close - 232.3
-  
-  
-  
-  #No coicide la cantidad de filas [mas filas de rango$sentiminet]
-  TSLAStockData.TEMP <- add_column(
-    .data = TSLAStockData.TEMP,
-    rango$Sentiment,
-    .after = 7
+  TSLAStockData.TEMP <- left_join(
+    x = TSLAStockData.TEMP, 
+    y = TSLAStockData.TEMP.S,
+    by = c("Fecha" = "Fecha")
   )
   
+  return(TSLAStockData.TEMP)
 }
 
-#por que no medir el sentimiento con los mismos parametros por el mes en el que estas interesado, envez de crear tantas variables.
-#la variables [meses] esta bien, pero hay que empezar a analizar el texto para ver el sentimiento de cada mes y ver como se relacióna
-#con los movimientos en la bolsa de valores.
+#Tomando en cuenta todos los dias
+Analysis.C <- function(){
+  TSLATwitterTimeline.df.SA.r$Sentimiento_Neutro <- as.numeric( TSLATwitterTimeline.df.SA.r$Sentimiento_Neutro)
+  TSLATwitterTimeline.df.SA.r$Sentimiento_Negativo <- as.numeric(TSLATwitterTimeline.df.SA.r$Sentimiento_Negativo)
+  
+  TSLATwitterTimeline.df.SA.r.OC <- add_column(
+    .data = TSLATwitterTimeline.df.SA.r,
+    "Neutro+Negtivo" = TSLATwitterTimeline.df.SA.r$Sentimiento_Neutro+TSLATwitterTimeline.df.SA.r$Sentimiento_Negativo,
+    .after = 10
+  )
+  
+  TSLATwitterTimeline.df.SA.r.OC <- subset(
+    x = TSLATwitterTimeline.df.SA.r.OC,
+    subset = TSLATwitterTimeline.df.SA.r.OC$Open > TSLATwitterTimeline.df.SA.r.OC$Close,
+    select = c("Fecha", "Open", "Close", "Sentimiento_Positivo", "Neutro+Negtivo")
+  )
+  
+  View(TSLATwitterTimeline.df.SA.r.OC)
+  View(TSLATwitterTimeline.df.SA.r[1:20,])
+  
+  TSLATwitterTimeline.df.SA.r.OC.E <- ((TSLATwitterTimeline.df.SA.r.OC$Open > TSLATwitterTimeline.df.SA.r.OC$Close) & (TSLATwitterTimeline.df.SA.r.OC$Sentimiento_Positivo <= TSLATwitterTimeline.df.SA.r.OC$`Neutro+Negtivo`))
+  
+  registro <- 1
+  countT.temp <- 0
+  countF.temp <- 0
+  
+  while(registro <= length(TSLATwitterTimeline.df.SA.r.OC$Fecha) ){
+    ifelse(
+      test = TSLATwitterTimeline.df.SA.r.OC.E[registro] == TRUE,
+      yes = countT.temp <- countT.temp +1,
+      no = if(TSLATwitterTimeline.df.SA.r.OC.E[registro] == FALSE){
+        countF.temp <- countF.temp + 1
+      }
+    )
+    registro <- registro + 1
+  }
+  
+  #628
+  countT.temp2 <- countT.temp/length(TSLATwitterTimeline.df.SA.r.OC$Fecha)
+  #.3964%
+  
+  countF.temp2 <- countF.temp/length(TSLATwitterTimeline.df.SA.r.OC$Fecha)
+  #.25%
+  
+  countT.temp2
+  countF.temp2
+  return(c(countT.temp2,countF.temp2))
+}
+
+#Tomando en cuenta los dias que se publican
+Analysis.R <- function(){
+  TSLATwitterTimeline.df.SA.r$Sentimiento_Neutro <- as.numeric( TSLATwitterTimeline.df.SA.r$Sentimiento_Neutro)
+  TSLATwitterTimeline.df.SA.r$Sentimiento_Negativo <- as.numeric(TSLATwitterTimeline.df.SA.r$Sentimiento_Negativo)
+  TSLATwitterTimeline.df.SA.r$Sentimiento_Positivo <- as.numeric(TSLATwitterTimeline.df.SA.r$Sentimiento_Positivo)
+  
+  TSLATwitterTimeline.df.SA.r.OC <- add_column(
+    .data = TSLATwitterTimeline.df.SA.r,
+    "Neutro+Negtivo" = TSLATwitterTimeline.df.SA.r$Sentimiento_Neutro+TSLATwitterTimeline.df.SA.r$Sentimiento_Negativo,
+    .after = 10
+  )
+  
+  TSLATwitterTimeline.df.SA.r.OC <- subset(
+    x = TSLATwitterTimeline.df.SA.r.OC,
+    subset = TSLATwitterTimeline.df.SA.r.OC$Open > TSLATwitterTimeline.df.SA.r.OC$Close,
+    select = c("Fecha", "Open", "Close", "Sentimiento_Positivo", "Neutro+Negtivo")
+  )
+  
+  View(TSLATwitterTimeline.df.SA.r.OC)
+  View(TSLATwitterTimeline.df.SA.r[1:20,])
+  
+  TSLATwitterTimeline.df.SA.r.OC.E <- ((TSLATwitterTimeline.df.SA.r.OC$Open > TSLATwitterTimeline.df.SA.r.OC$Close) & (TSLATwitterTimeline.df.SA.r.OC$Sentimiento_Positivo <= TSLATwitterTimeline.df.SA.r.OC$`Neutro+Negtivo`))
+  
+  registro <- 1
+  countT.temp <- 0
+  countF.temp <- 0
+  
+  while(registro <= length(TSLATwitterTimeline.df.SA.r.OC$Sentimiento_Positivo)){
+    ifelse(
+      test = TSLATwitterTimeline.df.SA.r.OC.E[registro] == TRUE,
+      yes = countT.temp <- countT.temp +1,
+      no = if(TSLATwitterTimeline.df.SA.r.OC.E[registro] == FALSE){
+        countF.temp <- countF.temp + 1
+      }
+    )
+    registro <- registro + 1
+  }
+  
+  total <- countT.temp + countF.temp #406
+  
+  countT.temp2 <- countT.temp/total #.6133%
+  countF.temp2 <- countF.temp/total #.3866%
+  
+  return(c(countT.temp2, countF.temp2))
+}
 
 
 
-#hacer una agrupación por meses los movimientos y comparar los
-#movimiento en la bolsa de valores.
-
-
-
-
-
-
-
+#Agregar el sentiemint que expresan los followers y ver en que dias compraten con los que existen en la bolsa de valores y 
+#como resulta la tabla 
 
 #Followers Twitter Timeline
 TSLAFollowerTweets.df
