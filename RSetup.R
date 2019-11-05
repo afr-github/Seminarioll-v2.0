@@ -206,6 +206,28 @@ View(TSLATwitterTimeline.df.SA.r)
 
 #Cuando el precio de cierre termina menor que el precio de apertura existen mas sentimientos negativos y neutros que positivos
 #628 registos
+TSLATwitterTimeline.df.SA.AnalysisCompleto <- function(){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")  
+    TSLATwitterTimeline.df.SA.AC <- Analysis.C()
+  }
+  return(TSLATwitterTimeline.df.SA.AC)
+}
+
+TSLATwitterTimeline.df.SA.AC <- TSLATwitterTimeline.df.SA.AnalysisCompleto()
+
+
+TSLATwitterTimeline.df.SA.AnalysisReal <- function(){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")  
+    TSLATwitterTimeline.df.SA.AR <- Analysis.R()
+  }
+  return(TSLATwitterTimeline.df.SA.AR)
+}
+
+TSLATwitterTimeline.df.SA.AR <- TSLATwitterTimeline.df.SA.AnalysisReal()
+
+
 
 
 

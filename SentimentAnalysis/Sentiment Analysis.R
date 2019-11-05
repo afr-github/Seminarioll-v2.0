@@ -240,10 +240,7 @@ Analysis.C <- function(){
     subset = TSLATwitterTimeline.df.SA.r.OC$Open > TSLATwitterTimeline.df.SA.r.OC$Close,
     select = c("Fecha", "Open", "Close", "Sentimiento_Positivo", "Neutro+Negtivo")
   )
-  
-  View(TSLATwitterTimeline.df.SA.r.OC)
-  View(TSLATwitterTimeline.df.SA.r[1:20,])
-  
+
   TSLATwitterTimeline.df.SA.r.OC.E <- ((TSLATwitterTimeline.df.SA.r.OC$Open > TSLATwitterTimeline.df.SA.r.OC$Close) & (TSLATwitterTimeline.df.SA.r.OC$Sentimiento_Positivo <= TSLATwitterTimeline.df.SA.r.OC$`Neutro+Negtivo`))
   
   registro <- 1
@@ -290,9 +287,6 @@ Analysis.R <- function(){
     subset = TSLATwitterTimeline.df.SA.r.OC$Open > TSLATwitterTimeline.df.SA.r.OC$Close,
     select = c("Fecha", "Open", "Close", "Sentimiento_Positivo", "Neutro+Negtivo")
   )
-  
-  View(TSLATwitterTimeline.df.SA.r.OC)
-  View(TSLATwitterTimeline.df.SA.r[1:20,])
   
   TSLATwitterTimeline.df.SA.r.OC.E <- ((TSLATwitterTimeline.df.SA.r.OC$Open > TSLATwitterTimeline.df.SA.r.OC$Close) & (TSLATwitterTimeline.df.SA.r.OC$Sentimiento_Positivo <= TSLATwitterTimeline.df.SA.r.OC$`Neutro+Negtivo`))
   
