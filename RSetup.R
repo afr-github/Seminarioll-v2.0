@@ -62,58 +62,15 @@ TSLATwitterTimeline <- function(){
   if(file.exists("TSLATwitterTimeline/TSLATwitterTimelineSearch.R")){
     source("TSLATwitterTimeline/TSLATwitterTimelineSearch.R")
     TSLATwitterTimeline.df <- TSLATwitterTimeline.Load()
+    TSLAInfo.Search()
+    TSLAInfo.Write()
   }
   return(TSLATwitterTimeline.df)
 }
+#View(TSLAInfo.Load())
+
 TSLATwitterTimeline.df <- TSLATwitterTimeline()
 #View(TSLATwitterTimeline.df)
-
-#### TSLAFollowerTwitterTimeline ####
-#Se carga el archvivo con los Followers de Tesla
-TSLAFollowerTwitterTimeline <- function(){
-  if(file.exists("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")){
-    source("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")
-    TSLATFollowerTwitterTimeline.df <- TSLAFollowerTwitterTimeline.Load()
-  }
-  return(TSLATFollowerTwitterTimeline.df)
-}
-TSLATFollowerTwitterTimeline.df <- TSLAFollowerTwitterTimeline()
-#View(TSLATFollowerTwitterTimeline.df)
-
-#### TSLAFollowerSelect ####
-#Se seleccionan los usuarios que tengan almenos 15000 statuses (tweets) 
-TSLAFollowerSelect <- function(){
-  if(file.exists("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")){
-    source("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")
-    TSLATFollowerSelect.df <- TSLAFollowerSelect.Clean(TSLATFollowerTwitterTimeline.df)
-  }
-  return(TSLATFollowerSelect.df)
-}
-TSLATFollowerSelect.df <- TSLAFollowerSelect()
-
-#### TSLAFollowerBots ####
-#Se eliminan los usuario que tienen mas de .5% de probabilidad de ser bots
-TSLAFollowerBot <- function(){
-  if(file.exists("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")){
-    source("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")
-    TSLAFollowerBots.df <- TSLAFollowerBots.Select()  
-  }
-  return(TSLAFollowerBots.df)
-}
-TSLAFollowerBots.df <- TSLAFollowerBot()
-#View(TSLAFollowerBots.df)
-
-#### TSLAFollowersTweets ####
-#Todos los tweets de los Followers que cumplieron con los requisitos
-TSLAFollowerTweets <- function(){
-  if(file.exists("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")){
-    source("TSLAFollowerTwitterTimeline/TSLAFollowerTwitterTimelineSearch.R")
-    TSLAFollowerTweets.df <- TSLAFollowerTweets.Load()
-  }
-  return(TSLAFollowerTweets.df[4:length(TSLAFollowerTweets.df)])
-}
-TSLAFollowerTweets.df <- TSLAFollowerTweets()
-#View(TSLAFollowerTweets.df)
 
 #### SentimentAnalysis Tesla (Procesamiento) ####
 TSLASentimentAnalysis.ProcesarCorpus <- function(){
@@ -137,8 +94,9 @@ TSLASentimentAnalysis.TransformarCorpus <- function(){
   }
   return(TSLATwitterTimeline.df.SA.TC)
 }
-TSLATwitterTimeline.df.SA.TC <- TSLASentimentAnalysis.TransformarCorpus()
 
+TSLATwitterTimeline.df.SA.TC <- TSLASentimentAnalysis.TransformarCorpus()
+TSLATwitterTimeline.df.SA.df <- TSLASentimentAnalysis.TransformarCorpus()
 #### Inyectar TSLATwitterTimeline.df.SA.TC en TSLATwitterTimeline.df$text ####
 TSLATwitterTimeline.df$text <- TSLATwitterTimeline.df.SA.TC$text
 
@@ -155,6 +113,17 @@ TSLASentimentAnalysis <- function(){
 TSLATwitterTimeline.df.SA.df <- TSLASentimentAnalysis()
 #View(TSLATwitterTimeline.df.SA.df)
 
+#### SentimentAnalyis Tesla Union Sentiment ####
+TSLATwitterTimeline.df.SA.union <- function(){
+  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
+    source("SentimentAnalysis/Sentiment Analysis.R")  
+    TSLATwitterTimeline.df.SA.U <- UnionTablas()
+  }
+  
+  return(TSLATwitterTimeline.df.SA.U)
+}
+TSLATwitterTimeline.df.SA.U <- TSLATwitterTimeline.df.SA.union()
+
 #### SentimentAnalysis Tesla Top Words ####
 TSLASentimentAnalysis.top <- function(){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
@@ -167,16 +136,6 @@ TSLASentimentAnalysis.top <- function(){
   return(TSLATwitterTimeline.df.SA.df)
 }
 TSLASentimentAnalysis.top()
-
-#### SentimentAnalyis Tesla Union Sentiment ####
-TSLATwitterTimeline.df.SA.union <- function(){
-  if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
-    source("SentimentAnalysis/Sentiment Analysis.R")  
-    TSLATwitterTimeline.df.SA.U <- UnionTablas()
-  }
-  return(TSLATwitterTimeline.df.SA.U)
-}
-TSLATwitterTimeline.df.SA.U <- TSLATwitterTimeline.df.SA.union()
 
 #### SentimentAnalysis Tesla Identificación Mensual ####
 TSLATwitterTimeline.df.SA.imensual <- function(fecha1, fecha2){
@@ -192,7 +151,6 @@ TSLATwitterTimeline.df.SA.imensual <- function(fecha1, fecha2){
 TSLATwitterTimeline.df.SA.im <- TSLATwitterTimeline.df.SA.imensual("01/06/2014", "31/05/2019")
 View(TSLATwitterTimeline.df.SA.im)
 
-
 #### SentimentAnalysis Tesla Resultado ####
 TSLATwitterTimeline.df.SA.resultdo <- function(rango){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
@@ -204,8 +162,23 @@ TSLATwitterTimeline.df.SA.resultdo <- function(rango){
 TSLATwitterTimeline.df.SA.r <- TSLATwitterTimeline.df.SA.resultdo(TSLATwitterTimeline.df.SA.im)
 View(TSLATwitterTimeline.df.SA.r)
 
-#Cuando el precio de cierre termina menor que el precio de apertura existen mas sentimientos negativos y neutros que positivos
-#628 registos
+write.csv(
+  x = TSLATwitterTimeline.df.SA.r,
+  file = "TSLATwitterTimeline/TSLATwitterTimeline.df.SA.r.csv"
+)
+
+
+
+
+
+
+
+
+
+
+
+##### No es requerido ####
+#Cuando el precio de cierre termina menor que el precio de apertura existen mas sentimientos negativos y neutros que positivos *628 registos
 TSLATwitterTimeline.df.SA.AnalysisCompleto <- function(){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
     source("SentimentAnalysis/Sentiment Analysis.R")  
@@ -213,9 +186,7 @@ TSLATwitterTimeline.df.SA.AnalysisCompleto <- function(){
   }
   return(TSLATwitterTimeline.df.SA.AC)
 }
-
 TSLATwitterTimeline.df.SA.AC <- TSLATwitterTimeline.df.SA.AnalysisCompleto()
-
 
 TSLATwitterTimeline.df.SA.AnalysisReal <- function(){
   if(file.exists("SentimentAnalysis/Sentiment Analysis.R")){
@@ -224,17 +195,5 @@ TSLATwitterTimeline.df.SA.AnalysisReal <- function(){
   }
   return(TSLATwitterTimeline.df.SA.AR)
 }
-
 TSLATwitterTimeline.df.SA.AR <- TSLATwitterTimeline.df.SA.AnalysisReal()
-
-
-
-
-
-
-
-
-#### SentimentAnalysis Followers ####
-TSLAFollowersSentimentAnalysis <- function(){
-  
-}
+View(TSLATwitterTimeline.df.SA.AR)

@@ -1,5 +1,35 @@
 #Tesla Twitter Timeline search
 
+##### Busqueda de informacion de Tesla ####
+TSLAInfo.Search <- function(){
+  TSLAInformation <- twitteR::getUser(
+    user = "Tesla"
+  )
+  
+  TSLAInformation.df <- as.data.frame(TSLAInformation)
+  
+  return(TSLAInformation.df)
+}
+
+##### Escritura de informacion encontrada de Tesla ####
+TSLAInfo.Write <- function(){
+  write.csv(
+    x = TSLAInfo.Search(),
+    file = "TSLATwitterTimeline/TSLAData.csv"
+  )
+}
+
+##### Cargar la informacion de Tesla ####
+TSLAInfo.Load <- function(){
+  if(file.exists("TSLATwitterTimeline/TSLAData.csv")){
+    TSLAData.csv <- read.csv(
+      file = "TSLATwitterTimeline/TSLAData.csv",
+      stringsAsFactors = FALSE
+    )  
+  }
+  return(TSLAData.csv[2:length(TSLAData.csv)])
+}
+
 ##### Busqueda en twitter de 3200 tweets publicados por Tesla #####
 TSLATwitterTimeline.Search <- function(){
   TSLATwitterTimelineSearch <- rtweet::get_timeline(
@@ -76,7 +106,3 @@ TSLATwitterTimeline.Load <- function(){
   
   return(TSLATwitterTimeline.df)
 }
-
-
-
-
